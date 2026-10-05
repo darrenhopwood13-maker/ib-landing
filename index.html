@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>instructBrain - construction reports from site photographs</title>
+<meta name="description" content="instructBrain turns site photographs into client-ready construction reports: Schedule of Condition, snag write-ups, Property Inventories, Custom Reports, Project Reports and Weekly Compliance Registers. AI drafts referenced findings; you confirm and issue. Free for your first 3 reports.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap">
+<style>
+/* ============================================================
+   instructBrain landing page - standalone design mockup
+   Brand tokens taken from the live product stylesheet:
+     --product-accent  oklch(87.73% .2803 139.6) = #57ff00  (Laser Green)
+     --surface         oklch(38.6%  .105  262.6) = #24417b
+     --surface-raised  oklch(36.7%  .1    262.8) = #213c73
+     --surface-sunken  oklch(34.2%  .091  262.9) = #1e3667
+     fonts: Sora (display), Manrope (body), Audiowide (wordmark only)
+   No new colours, no new fonts. Accent used as accent only.
+   ============================================================ */
+:root{
+  --navy-900:#16294f;
+  --navy-800:#1e3667;
+  --navy-700:#213c73;
+  --navy-600:#24417b;
+  --ink:#eef3fa;
+  --ink-2:#c9d6ea;
+  --ink-3:#a9bbd6;
+  --accent:#57ff00;
+  --accent-deep:#2e8a00;
+  --line:rgba(255,255,255,.14);
+  --line-soft:rgba(255,255,255,.09);
+  --glass:rgba(255,255,255,.06);
+  --glass-2:rgba(255,255,255,.1);
+  --accent-glass:rgba(87,255,0,.14);
+  --nav-h:64px;
+  --pad:clamp(56px,6.4vh,84px);
+  --wrap:1240px;
+  --r-panel:16px;
+  --r-btn:10px;
+  --font-display:"Sora",ui-sans-serif,system-ui,sans-serif;
+  --font-sans:"Manrope",ui-sans-serif,system-ui,sans-serif;
+  --font-wordmark:"Audiowide","Sora",ui-sans-serif,system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background-color:var(--navy-600);
+  background-image:linear-gradient(180deg,#1b3160 0%,#213c73 55%,#1d3466 100%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:var(--font-sans);
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"tnum";
+  overflow-x:hidden;
+}
+/* blueprint grid, same treatment as the live product surface (7% white, 48px) */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;opacity:.07;pointer-events:none;
+  background-image:linear-gradient(90deg,#fbfbfb 1px,transparent 1px),linear-gradient(#fbfbfb 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.page{position:relative;z-index:1}
+img{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.14;margin:0;letter-spacing:-.015em;font-weight:700}
+p{margin:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;left:-9999px;top:0}
+.skip:focus{left:16px;top:12px;z-index:99;background:var(--navy-900);color:var(--ink);padding:10px 14px;border-radius:8px}
+.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:clamp(20px,3vw,40px)}
+
+/* ---------- wordmark ---------- */
+.wm{font-family:var(--font-wordmark);font-weight:400;letter-spacing:.005em;line-height:1;text-decoration:none;display:inline-block}
+.wm .i{color:#fff}
+.wm .b{color:var(--accent)}
+.wm-nav{font-size:19px}
+.wm-foot{font-size:22px}
+
+/* ---------- nav ---------- */
+.nav{
+  position:sticky;top:0;z-index:20;height:var(--nav-h);
+  background:rgba(24,44,85,.86);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line-soft);
+}
+.nav-in{height:var(--nav-h);display:flex;align-items:center;gap:22px}
+.nav-links{display:flex;align-items:center;gap:22px;margin-left:8px}
+.nav-links a{font-size:16px;font-weight:500;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.nav-links a:hover{color:#fff}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+@media (max-width:1199px){ .nav-links{display:none} }
+
+/* ---------- buttons (radius rule: buttons 10px, panels 16px, chips pill) ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--font-sans);font-size:16px;font-weight:700;line-height:1;
+  padding:14px 20px;border-radius:var(--r-btn);text-decoration:none;border:1px solid transparent;
+  white-space:nowrap;transition:background .16s ease,transform .16s ease,border-color .16s ease}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--accent);color:#0d1a0a;border-color:var(--accent);box-shadow:0 8px 22px -14px rgba(87,255,0,.9)}
+.btn-primary:hover{background:#7bff33}
+.btn-ghost{background:transparent;color:var(--ink);border-color:rgba(255,255,255,.34)}
+.btn-ghost:hover{background:var(--glass-2);border-color:rgba(255,255,255,.55)}
+.btn-line{background:var(--glass);color:var(--ink);border-color:var(--line)}
+.btn-line:hover{background:var(--glass-2)}
+.btn-sm{padding:11px 16px;font-size:16px}
+
+/* ---------- hero ---------- */
+.hero{padding-top:clamp(22px,3.2vh,40px);padding-bottom:clamp(40px,6vh,70px)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);
+  gap:clamp(26px,3.6vw,58px);align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;
+  color:var(--accent);background:var(--accent-glass);border:1px solid rgba(87,255,0,.4);
+  padding:7px 13px;border-radius:999px;line-height:1.2}
+h1.hero-h{font-size:clamp(31px,3.45vw,52px);font-weight:800;margin-top:20px}
+.hero-sub{font-size:clamp(17px,1.15vw,19px);color:var(--ink-2);margin-top:16px;max-width:34ch;line-height:1.55}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+
+/* ---------- product console (right of hero) ---------- */
+.console{background:rgba(13,25,50,.62);border:1px solid var(--line);border-radius:var(--r-panel);
+  padding:14px;box-shadow:0 30px 70px -40px rgba(0,0,0,.85)}
+.console-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:2px 4px 12px;border-bottom:1px solid var(--line-soft)}
+.wm-con{font-size:15px}
+.ref{font-size:14px;color:var(--ink-3);font-weight:600;white-space:nowrap}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.shots img{width:100%;height:74px;object-fit:cover;border-radius:10px;border:1px solid var(--line-soft)}
+.find-head{display:flex;align-items:center;gap:10px;margin:14px 4px 8px}
+.find-head h2,.find-head p{font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:.01em}
+.count{font-size:14px;font-weight:600;color:var(--ink-3);margin-left:auto}
+.find-rows{display:flex;flex-direction:column}
+.find{display:flex;align-items:center;gap:11px;padding:9px 4px;border-top:1px solid var(--line-soft)}
+.find:first-child{border-top:0}
+.fref{font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--ink-3);min-width:46px}
+.ftxt{font-size:16px;color:var(--ink);flex:1;min-width:0}
+.chip{font-size:14px;font-weight:700;padding:5px 10px;border-radius:999px;white-space:nowrap;border:1px solid transparent;line-height:1.1}
+.chip-pass{color:var(--accent);background:var(--accent-glass);border-color:rgba(87,255,0,.5)}
+.chip-warn{color:#fff;background:var(--glass-2);border-color:rgba(255,255,255,.32)}
+.chip-na{color:var(--ink-3);background:transparent;border:1px dashed rgba(255,255,255,.3)}
+.console-foot{margin-top:12px;padding:11px 4px 2px;border-top:1px solid var(--line-soft);
+  font-size:16px;color:var(--ink-2);display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.dot-sep{color:var(--ink-3)}
+
+/* ---------- generic section ---------- */
+.sec{padding-block:var(--pad);border-top:1px solid var(--line-soft)}
+.sec-alt{background:rgba(11,22,45,.34)}
+.sec-h{margin:0 auto;max-width:22ch;font-size:clamp(26px,2.45vw,40px);font-weight:700}
+.sec-h.wide{max-width:30ch}
+.sec-sub{margin-top:14px;font-size:17px;color:var(--ink-2);max-width:62ch;line-height:1.6}
+.sec-head{margin-bottom:clamp(28px,3.6vh,46px)}
+.eyebrow-2{display:inline-block;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:14px}
+.kicker{font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+
+/* ---------- one-liner band ---------- */
+.band{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(24px,3vw,52px);align-items:center}
+.band h2{font-size:clamp(25px,2.3vw,38px);max-width:26ch}
+.flow{display:flex;align-items:center;gap:14px}
+.flow-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;flex:1;min-width:0}
+.flow-strip img{width:100%;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--line-soft)}
+.arrow{color:var(--accent);font-family:var(--font-display);font-size:22px;line-height:1}
+.flow-out{display:flex;flex-direction:column;gap:4px;border:1px solid rgba(87,255,0,.45);
+  background:var(--accent-glass);border-radius:12px;padding:10px 14px;min-width:0}
+.flow-out strong{font-family:var(--font-display);font-size:16px;color:var(--accent)}
+.flow-out span{font-size:16px;color:var(--ink-2)}
+
+/* ---------- credibility list ---------- */
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:30px}
+.rule{background:var(--glass);border:1px solid var(--line);border-radius:var(--r-panel);padding:20px}
+.rule h3{font-size:17px;font-weight:700;margin-bottom:8px}
+.rule p{font-size:16px;color:var(--ink-2);line-height:1.58}
+
+/* ---------- manual (no AI) section ---------- */
+.manual{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.86fr);gap:clamp(26px,3.4vw,54px);align-items:center}
+.manual-points{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:14px}
+.manual-points li{display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:16px;color:var(--ink-2);line-height:1.55}
+.tick{color:var(--accent);font-weight:800;font-family:var(--font-display)}
+.spec{background:rgba(13,25,50,.6);border:1px solid var(--line);border-radius:var(--r-panel);padding:22px}
+.spec-label{font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.spec-rows{margin-top:16px;display:grid;gap:12px}
+.spec-row{display:flex;align-items:center;gap:12px;border:1px solid var(--line-soft);
+  border-radius:12px;padding:12px;background:var(--glass)}
+.spec-row .n{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--accent);min-width:60px}
+.spec-row .t{font-size:16px;color:var(--ink-2)}
+.spec-foot{margin-top:16px;font-size:16px;color:var(--ink-2);border-top:1px solid var(--line-soft);padding-top:14px}
+
+/* ---------- reports ---------- */
+.feat{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
+  gap:clamp(24px,3vw,48px);align-items:center;background:rgba(13,25,50,.55);
+  border:1px solid rgba(87,255,0,.35);border-left:3px solid var(--accent);
+  border-radius:var(--r-panel);padding:clamp(22px,2.6vw,34px)}
+.feat h3{font-size:clamp(22px,1.95vw,30px)}
+.lead-tag{display:inline-block;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:12px}
+.feat p.body{font-size:17px;color:var(--ink-2);margin-top:14px;line-height:1.6}
+.feat ul{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px}
+.feat li{display:grid;grid-template-columns:20px 1fr;gap:11px;font-size:16px;color:var(--ink-2);line-height:1.5}
+.grades{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.grade{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600;color:var(--ink-2);
+  border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:8px 13px}
+.grade b{font-family:var(--font-display);font-size:16px;color:var(--ink)}
+.grade.gA{border-color:rgba(87,255,0,.55);background:var(--accent-glass)}
+.grade.gA b{color:var(--accent)}
+.shot-card{border:1px solid var(--line);border-radius:var(--r-panel);overflow:hidden;background:rgba(13,25,50,.6)}
+.shot-card img{width:100%;height:212px;object-fit:cover}
+.shot-cap{padding:14px;border-top:1px solid var(--line-soft)}
+.shot-cap .rid{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--ink-3)}
+.shot-cap p{font-size:16px;color:var(--ink-2);margin-top:5px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:22px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:var(--r-panel);padding:22px;display:flex;flex-direction:column}
+.card img{width:46px;height:46px;object-fit:contain;margin-bottom:14px}
+.card h3{font-size:18px;font-weight:700}
+.card p{font-size:16px;color:var(--ink-2);margin-top:9px;line-height:1.58}
+.card.wide{grid-column:span 2}
+.craft{margin-top:22px;border:1px solid var(--line-soft);background:rgba(13,25,50,.45);border-radius:var(--r-panel);
+  padding:18px 20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.craft div{font-size:16px;color:var(--ink-2);display:grid;gap:3px}
+.craft strong{font-family:var(--font-display);font-size:16px;color:var(--ink);font-weight:600}
+
+/* ---------- language section ---------- */
+.lang{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);gap:clamp(26px,3.4vw,54px);align-items:center}
+.lang-stat{margin-top:26px;display:flex;align-items:center;gap:18px;border:1px solid rgba(87,255,0,.45);
+  background:var(--accent-glass);border-radius:var(--r-panel);padding:18px 22px;max-width:520px}
+.lang-stat .n{font-family:var(--font-display);font-size:clamp(38px,3.6vw,56px);font-weight:800;color:var(--accent);line-height:1}
+.lang-stat .l{font-size:16px;color:var(--ink-2);line-height:1.45}
+.lang-stat .l strong{color:var(--ink);font-weight:700}
+.lang-label{font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.lang-cloud{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+.lang-cloud li{font-size:16px;color:var(--ink);background:var(--glass);border:1px solid var(--line);
+  border-radius:999px;padding:7px 13px;line-height:1.3;
+  /* native scripts need script-specific fallbacks, or the glyphs fall back to tofu.
+     These are system fallbacks, not a change of brand typeface (Manrope stays first). */
+  font-family:"Manrope","Noto Sans","Noto Sans CJK SC","Noto Sans SC","Noto Sans Devanagari",
+    "Noto Sans Bengali","Noto Sans Thai","Noto Sans Arabic","Noto Sans Hebrew","Segoe UI",
+    "Nirmala UI","Microsoft YaHei","Malgun Gothic","Hiragino Sans","PingFang SC","Geeza Pro",sans-serif}
+.lang-cloud li[dir="rtl"]{color:var(--ink-2)}
+.lang-foot{margin-top:14px;font-size:16px;color:var(--ink-3)}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.step{border-top:2px solid var(--accent);padding-top:18px}
+.step .num{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--accent);letter-spacing:.08em}
+.step h3{font-size:20px;margin-top:8px}
+.step p{font-size:16px;color:var(--ink-2);margin-top:9px;line-height:1.58}
+
+/* ---------- evidence ---------- */
+.chain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:26px}
+.link-card{border:1px solid var(--line);border-radius:var(--r-panel);background:rgba(13,25,50,.5);padding:20px}
+.link-card .k{font-size:14px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.link-card h3{font-size:18px;margin-top:9px}
+.link-card p{font-size:16px;color:var(--ink-2);margin-top:8px;line-height:1.55}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.note{margin:0;background:var(--glass);border:1px solid var(--line);border-left:2px solid var(--accent);
+  border-radius:var(--r-panel);padding:20px}
+.note blockquote{margin:0;font-size:17px;color:var(--ink);line-height:1.5}
+.note cite{display:block;margin-top:12px;font-style:normal;font-size:16px;color:var(--ink-3)}
+
+/* ---------- proof ---------- */
+.proof{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(24px,3vw,50px);align-items:start}
+.quote{border-left:3px solid var(--accent);padding-left:22px}
+.quote blockquote{margin:0;font-family:var(--font-display);font-size:clamp(18px,1.5vw,23px);
+  font-weight:600;line-height:1.42;letter-spacing:-.01em}
+.quote cite{display:block;margin-top:16px;font-style:normal;font-size:16px;color:var(--ink-2)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.stat{background:var(--glass);border:1px solid var(--line);border-radius:var(--r-panel);padding:18px}
+.stat .v{font-family:var(--font-display);font-size:clamp(24px,2.1vw,34px);font-weight:800;color:var(--accent);line-height:1}
+.stat .l{font-size:16px;color:var(--ink-2);margin-top:8px}
+.savings{margin-top:22px;border:1px solid var(--line-soft);background:rgba(13,25,50,.45);
+  border-radius:var(--r-panel);padding:20px}
+.savings h3{font-size:18px}
+.savings p{font-size:16px;color:var(--ink-3);margin-top:8px;line-height:1.5}
+.sav-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+.sav-grid div{border-top:2px solid rgba(255,255,255,.2);padding-top:12px}
+.sav-grid .v{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--ink)}
+.sav-grid .l{font-size:16px;color:var(--ink-2);margin-top:6px}
+
+/* ---------- pricing ---------- */
+.tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.tier{background:var(--glass);border:1px solid var(--line);border-radius:var(--r-panel);padding:22px;
+  display:flex;flex-direction:column;gap:0}
+.tier h3{font-size:19px}
+.tier .price{font-family:var(--font-display);font-size:clamp(23px,1.9vw,30px);font-weight:800;margin-top:12px;line-height:1}
+.tier .price small{font-family:var(--font-sans);font-size:16px;font-weight:600;color:var(--ink-3)}
+.tier .what{font-size:16px;color:var(--ink-2);margin-top:10px;min-height:64px;line-height:1.5}
+.tier ul{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:9px}
+.tier li{font-size:16px;color:var(--ink-2);display:grid;grid-template-columns:18px 1fr;gap:9px;line-height:1.45}
+.tier .btn{margin-top:20px;width:100%}
+.tier-pop{border-color:rgba(87,255,0,.5);background:var(--accent-glass)}
+.badge{display:inline-block;font-size:14px;font-weight:700;color:var(--accent);background:rgba(87,255,0,.16);
+  border:1px solid rgba(87,255,0,.45);border-radius:999px;padding:4px 10px;margin-bottom:12px;align-self:flex-start}
+.price-note{margin-top:20px;font-size:16px;color:var(--ink-2);max-width:74ch}
+
+/* ---------- final cta ---------- */
+.final{background:rgba(11,22,45,.5);border-top:1px solid var(--line-soft)}
+.final-in{display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.final h2{font-size:clamp(25px,2.3vw,38px);max-width:24ch}
+.final p{font-size:17px;color:var(--ink-2);margin-top:14px;max-width:52ch}
+.final .hero-cta{margin-top:22px}
+
+/* ---------- footer ---------- */
+.foot{padding-block:44px;border-top:1px solid var(--line-soft);background:rgba(11,22,45,.55)}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr);gap:32px}
+.foot h2{font-size:16px;font-family:var(--font-display);font-weight:700;letter-spacing:.02em;color:var(--ink)}
+.index{list-style:none;padding:0;margin:14px 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 22px}
+.index a{font-size:16px;color:var(--ink-2);text-decoration:none}
+.index a:hover{color:var(--accent)}
+.index .sub{font-size:16px;color:var(--ink-3);padding-left:14px}
+.legal{margin-top:22px;font-size:16px;color:var(--ink-3);display:flex;gap:18px;flex-wrap:wrap}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){
+  .rules,.cards,.steps,.chain,.notes,.sav-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card.wide{grid-column:span 2}
+  .craft{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero-grid,.band,.manual,.feat,.proof,.foot-grid,.lang{grid-template-columns:minmax(0,1fr)}
+  .feat .shot-card{order:-1}
+  .hero-sub{max-width:52ch}
+  .lang-stat{max-width:none}
+}
+@media (max-width:640px){
+  .rules,.cards,.steps,.chain,.notes,.sav-grid,.craft,.tiers,.stats{grid-template-columns:minmax(0,1fr)}
+  .card.wide{grid-column:span 1}
+  .index{grid-template-columns:minmax(0,1fr)}
+  .flow{flex-direction:column;align-items:stretch}
+  .hero-cta .btn{width:100%}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;scroll-behavior:auto} }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<div class="page" id="top">
+
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="wm wm-nav" href="#top" aria-label="instructBrain home"><span class="i">instruct</span><span class="b">Brain</span></a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#reports">Reports</a>
+      <a href="#manual">Manual reports</a>
+      <a href="#languages">Languages</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-right">
+      <a class="btn btn-ghost btn-sm" href="https://instructbrain.com/auth/sign-in">Sign in</a>
+      <a class="btn btn-primary btn-sm" href="https://instructbrain.com/auth/sign-up">Start free</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<section class="hero" aria-labelledby="hero-h">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Construction reports from site photographs</p>
+      <h1 class="hero-h" id="hero-h">Walk the site. Issue the same afternoon.</h1>
+      <p class="hero-sub">Photographs in, referenced reports out. The AI drafts, you confirm, you issue before you drive home.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="https://instructbrain.com/auth/sign-up">Start free, 3 reports</a>
+        <a class="btn btn-ghost" href="https://instructbrain.com/auth/sign-in">Sign in</a>
+      </div>
+    </div>
+
+    <aside class="console" aria-label="Example report panel built from real instructBrain demo photographs">
+      <div class="console-bar">
+        <span class="wm wm-con"><span class="i">instruct</span><span class="b">Brain</span></span>
+        <span class="ref">Site walk <span class="dot-sep">/</span> ALM-2026-0142</span>
+      </div>
+      <div class="shots">
+        <img src="https://instructbrain.com/demo/photo-1.jpg" alt="Site photograph of a skirting and wall junction with a visible crack line" width="200" height="74" fetchpriority="high">
+        <img src="https://instructbrain.com/demo/photo-2.jpg" alt="Site photograph of a ceiling downlight with cracked plasterboard around it" width="200" height="74" fetchpriority="high">
+        <img src="https://instructbrain.com/demo/photo-5.jpg" alt="Site photograph of an internal door edge and lever handle in low light" width="200" height="74" fetchpriority="high">
+      </div>
+      <div class="find-head">
+        <h2>Findings</h2>
+        <p class="count">4 items</p>
+      </div>
+      <div class="find-rows">
+        <div class="find">
+          <span class="fref">F-001</span>
+          <span class="ftxt">Crack at skirting and wall junction</span>
+          <span class="chip chip-warn">Warn</span>
+        </div>
+        <div class="find">
+          <span class="fref">F-002</span>
+          <span class="ftxt">Cracked plasterboard around ceiling downlight</span>
+          <span class="chip chip-warn">Warn</span>
+        </div>
+        <div class="find">
+          <span class="fref">F-003</span>
+          <span class="ftxt">Door edge, obscured by low light</span>
+          <span class="chip chip-na">Not assessed</span>
+        </div>
+        <div class="find">
+          <span class="fref">F-004</span>
+          <span class="ftxt">Door frame and lining, no defect found</span>
+          <span class="chip chip-pass">Pass</span>
+        </div>
+      </div>
+      <div class="console-foot">
+        <span>Issued PDF, 4 findings</span>
+        <span class="dot-sep">/</span>
+        <span>Contents page</span>
+        <span class="dot-sep">/</span>
+        <span>Per-trade extracts</span>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= ONE LINE ================= -->
+<section class="sec sec-alt" aria-labelledby="what-h">
+  <div class="wrap band">
+    <div>
+      <p class="kicker">What it does</p>
+      <h2 id="what-h">Photographs in, referenced reports out.</h2>
+      <p class="sec-sub">You photograph the site the way you always have. instructBrain reads every photograph, drafts the findings against your report template, and hands them back for a person to confirm and issue.</p>
+    </div>
+    <div class="flow" role="img" aria-label="Five site photographs leading to an issued PDF report">
+      <div class="flow-strip">
+        <img src="https://instructbrain.com/demo/photo-1.jpg" alt="Photograph of a cracked skirting and wall junction" width="120" height="52">
+        <img src="https://instructbrain.com/demo/photo-2.jpg" alt="Photograph of a ceiling downlight with cracked plasterboard" width="120" height="52">
+        <img src="https://instructbrain.com/demo/photo-3.jpg" alt="Photograph of a window reveal with a crack to the lining" width="120" height="52">
+        <img src="https://instructbrain.com/demo/photo-4.jpg" alt="Photograph of a floor tile junction and edge trim" width="120" height="52">
+        <img src="https://instructbrain.com/demo/photo-5.jpg" alt="Photograph of an internal door edge and lever handle" width="120" height="52">
+      </div>
+      <span class="arrow" aria-hidden="true">&rarr;</span>
+      <div class="flow-out">
+        <strong>Issued PDF</strong>
+        <span>Referenced findings</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= AI IN PLAIN ENGLISH ================= -->
+<section class="sec" aria-labelledby="ai-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">The AI, in plain English</p>
+      <h2 class="sec-h wide" id="ai-h">It drafts. A person confirms. Nothing is asserted without sign-off.</h2>
+      <p class="sec-sub">instructBrain looks at every photograph, describes what it sees in the language you would use, decides how serious it is, and says what to do about it. It describes conditions and hazards only, never people. When it cannot tell, it says so rather than guessing, and no guess becomes a pass.</p>
+    </div>
+    <div class="rules">
+      <article class="rule">
+        <h3>The AI drafts, a person issues</h3>
+        <p>Every finding waits for a human. You confirm or correct, then issue. Nothing enters a report without someone putting their name to it.</p>
+      </article>
+      <article class="rule">
+        <h3>Not assessed is a real answer</h3>
+        <p>Bad light, an awkward angle, an obscured detail. When the AI cannot tell, the item reads not assessed instead of a guess. No guess becomes a pass.</p>
+      </article>
+      <article class="rule">
+        <h3>No people in the record</h3>
+        <p>The AI never describes, counts or identifies people in a photograph. Findings that do involve people are restricted to supervisors and above, and excluded from subcontractor distribution.</p>
+      </article>
+      <article class="rule">
+        <h3>Grades are proposed, then confirmed</h3>
+        <p>A condition grade is proposed with a confidence figure and stays to be confirmed until a person accepts it. There is no silent default grade.</p>
+      </article>
+      <article class="rule">
+        <h3>Trades are suggestions</h3>
+        <p>A suggested trade is a suggestion, not an assertion. A person confirms every assignment before anything is distributed.</p>
+      </article>
+      <article class="rule">
+        <h3>The record is dated and attributable</h3>
+        <p>Each finding carries the photograph it came from, the date, and the person who confirmed it, so the trail stands up later.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MANUAL, NO AI ================= -->
+<section class="sec sec-alt" id="manual" aria-labelledby="manual-h">
+  <div class="wrap manual">
+    <div>
+      <p class="kicker">Manual reports, no AI in the path</p>
+      <h2 class="sec-h" id="manual-h">For the jobs where a model must not touch the record.</h2>
+      <p class="sec-sub">Sometimes the honest answer to "can we rely on what it says?" is that no AI should be in the report at all. Manual mode is a deliberate setting, not a fallback. The AI is switched off for that report and every item is authored by a person. Nothing in the delivered document was drafted or graded by a model.</p>
+      <ul class="manual-points">
+        <li><span class="tick" aria-hidden="true">&#10003;</span><span>Its own presentation: two items per A4 page, showing only the stable item reference and the capture date and time.</span></li>
+        <li><span class="tick" aria-hidden="true">&#10003;</span><span>Delivered as a final issued PDF, by design, rather than a recipient review page.</span></li>
+        <li><span class="tick" aria-hidden="true">&#10003;</span><span>Built for insurers, legal and contractual work, and for a client who will not accept an AI drafted finding.</span></li>
+      </ul>
+    </div>
+    <div class="spec" aria-label="Example manual report page">
+      <p class="spec-label">Manual report <span aria-hidden="true">&#183;</span> page 1 of 1</p>
+      <div class="spec-rows">
+        <div class="spec-row">
+          <span class="n">INV-014</span>
+          <span class="t">Item photographed, author recorded<br>Captured 14 Mar 2026, 09:41</span>
+        </div>
+        <div class="spec-row">
+          <span class="n">INV-015</span>
+          <span class="t">Item photographed, author recorded<br>Captured 14 Mar 2026, 09:47</span>
+        </div>
+      </div>
+      <p class="spec-foot">Issued as a PDF. No AI drafted content. Two items per A4 page.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REPORTS ================= -->
+<section class="sec" id="reports" aria-labelledby="reports-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">The reports you can issue</p>
+      <h2 class="sec-h wide" id="reports-h">Six report types, one evidence discipline.</h2>
+      <p class="sec-sub">A report is one job, from upload to issued PDF. Every type below is live in the product today.</p>
+    </div>
+
+    <article class="feat" id="condition" aria-labelledby="soc-h">
+      <div>
+        <p class="lead-tag">Schedule of Condition</p>
+        <h3 id="soc-h">Every element graded A to D on visible condition.</h3>
+        <p class="body">Element by element, each one photographed and graded. One grade per element, confirmed by a person. The report closes with a count of items per grade, and carries a mandatory scope and limitations block on the page itself. This is the one large property firms ask for by name.</p>
+        <div class="grades" role="list" aria-label="Condition grades">
+          <span class="grade gA" role="listitem"><b>A</b> Good</span>
+          <span class="grade" role="listitem"><b>B</b> Satisfactory</span>
+          <span class="grade" role="listitem"><b>C</b> Fair</span>
+          <span class="grade" role="listitem"><b>D</b> Poor</span>
+        </div>
+        <ul>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>One grade per element, confirmed by a person, never a silent default.</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Photograph against element, with the grade carried on the report.</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Mandatory scope and limitations block printed on the report.</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Closing count of items per grade.</span></li>
+        </ul>
+      </div>
+      <div class="shot-card">
+        <img src="https://instructbrain.com/demo/photo-4.jpg" alt="Site photograph of a floor tile junction and edge trim recorded for a Schedule of Condition" width="600" height="212" loading="lazy">
+        <div class="shot-cap">
+          <span class="rid">EL-14 <span aria-hidden="true">&#183;</span> Floor tiling and edge trim</span>
+          <p>Grade C, Fair, confirmed by the surveyor. Photograph dated and kept with the element.</p>
+        </div>
+      </div>
+    </article>
+
+    <div class="cards">
+      <article class="card">
+        <img src="https://instructbrain.com/3d/hard-hat-t.png" alt="" width="46" height="46" loading="lazy">
+        <h3>The snag write-up</h3>
+        <p>One photograph becomes a defect item with a title, the required action, an alternative fix, a trade tip and a health and safety note. One item per photograph, many photographs in one pass.</p>
+      </article>
+      <article class="card" id="inventories">
+        <img src="https://instructbrain.com/demo/photo-5.jpg" alt="Site photograph of an internal door, the kind of item recorded in a property inventory" width="46" height="46" style="width:100%;height:78px;object-fit:cover;border-radius:10px" loading="lazy">
+        <h3>Property Inventories</h3>
+        <p>A photographic inventory of a property or a space, item by item. Each item is captured with its own defined photo roles and limits, held in the versioned survey definition, so the same template produces a consistent record every time. Used for handover, handback and asset records.</p>
+      </article>
+      <article class="card">
+        <img src="https://instructbrain.com/3d/blueprints-t.png" alt="" width="46" height="46" loading="lazy">
+        <h3>Project Reports</h3>
+        <p>Site walks, snagging and weatherproofing. Referenced findings, suggested trades, per-trade extracts and close-out tracking.</p>
+      </article>
+      <article class="card">
+        <img src="https://instructbrain.com/3d/clipboard-t.png" alt="" width="46" height="46" loading="lazy">
+        <h3>Weekly Compliance Register</h3>
+        <p>Six checks, prefilled and ready to run. One non-compliant check raises an action with an owner and a due date. The run locks when it is complete, and the last six weeks sit side by side.</p>
+      </article>
+      <article class="card wide">
+        <h3>Custom Reports</h3>
+        <p>One-off inspections, specialist audits and batch photo reviews, issued from a template rather than a blank page. Suits a bespoke check you run once and want to look the same the next time.</p>
+      </article>
+    </div>
+
+    <div class="craft" aria-label="How every report is delivered">
+      <div><strong>Grouped by trade</strong><span>Reports open with findings grouped by trade.</span></div>
+      <div><strong>Per-trade extracts</strong><span>Each trade gets its own extract of the findings.</span></div>
+      <div><strong>Close-out tracking</strong><span>Track items to closed, where the job needs it.</span></div>
+      <div><strong>Shared links</strong><span>Send a link instead of a file where that suits.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LANGUAGES ================= -->
+<section class="sec sec-alt" id="languages" aria-labelledby="lang-h">
+  <div class="wrap lang">
+    <div>
+      <p class="kicker">Languages</p>
+      <h2 class="sec-h" id="lang-h">Issue the report in your client's language.</h2>
+      <p class="sec-sub">The preview, the print view, the PDF and the covering email all follow the language you pick, and the picker sits beside Issue and Share so it is a deliberate act at the moment of sending, never buried in a menu.</p>
+      <p class="sec-sub">English stays the record copy. A translation is a display layer over it, never a replacement, so the record you keep is the one you wrote.</p>
+      <div class="lang-stat">
+        <span class="n" aria-hidden="true">29</span>
+        <span class="l"><strong>client languages</strong> available besides English, including right to left typesetting for Arabic and Hebrew.</span>
+      </div>
+    </div>
+    <div>
+      <p class="lang-label">Available for issue</p>
+      <ul class="lang-cloud" role="list">
+        <li lang="es" role="listitem">Español</li>
+        <li lang="fr" role="listitem">Français</li>
+        <li lang="de" role="listitem">Deutsch</li>
+        <li lang="it" role="listitem">Italiano</li>
+        <li lang="pt" role="listitem">Português</li>
+        <li lang="nl" role="listitem">Nederlands</li>
+        <li lang="pl" role="listitem">Polski</li>
+        <li lang="ro" role="listitem">Română</li>
+        <li lang="ru" role="listitem">Русский</li>
+        <li lang="uk" role="listitem">Українська</li>
+        <li lang="tr" role="listitem">Türkçe</li>
+        <li lang="ar" dir="rtl" role="listitem">العربية</li>
+        <li lang="he" dir="rtl" role="listitem">עברית</li>
+        <li lang="zh" role="listitem">中文</li>
+        <li lang="ja" role="listitem">日本語</li>
+        <li lang="ko" role="listitem">한국어</li>
+        <li lang="hi" role="listitem">हिन्दी</li>
+        <li lang="bn" role="listitem">বাংলা</li>
+        <li lang="vi" role="listitem">Tiếng Việt</li>
+        <li lang="th" role="listitem">ไทย</li>
+        <li lang="id" role="listitem">Indonesia</li>
+        <li lang="sv" role="listitem">Svenska</li>
+        <li lang="no" role="listitem">Norsk</li>
+        <li lang="da" role="listitem">Dansk</li>
+        <li lang="fi" role="listitem">Suomi</li>
+        <li lang="el" role="listitem">Ελληνικά</li>
+        <li lang="cs" role="listitem">Čeština</li>
+        <li lang="bg" role="listitem">Български</li>
+        <li lang="lt" role="listitem">Lietuvių</li>
+      </ul>
+      <p class="lang-foot">Plus English, which is always the record copy and one press away at any time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="sec" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-h wide" id="how-h">Three steps, start to issued.</h2>
+    </div>
+    <div class="steps">
+      <article class="step">
+        <p class="num">Step one</p>
+        <h3>Upload the photographs</h3>
+        <p>Straight off the phone or the camera. HEIC and JPEG, with capture time and location kept intact. Full resolution originals go to the AI, display copies are handled separately.</p>
+      </article>
+      <article class="step">
+        <p class="num">Step two</p>
+        <h3>The AI drafts the findings</h3>
+        <p>Every photograph is read against the report template with structured output, confidence scoring and trade suggestions. When it is uncertain it routes to not assessed, never to a passing status.</p>
+      </article>
+      <article class="step">
+        <p class="num">Step three</p>
+        <h3>Review and issue</h3>
+        <p>Confirm or correct from the keyboard. Then issue a PDF with a contents page, per-trade extracts, close-out tracking and a share link, in the language the client needs.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EVIDENCE ================= -->
+<section class="sec sec-alt" id="evidence" aria-labelledby="ev-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Evidence and audit trail</p>
+      <h2 class="sec-h wide" id="ev-h">Photograph, certificate, clause. Dated and attributable.</h2>
+      <p class="sec-sub">A finding is only useful if you can show where it came from. Every item in the report traces back to its photograph, the compliance record it belongs to, and the regulation clause it was read against.</p>
+    </div>
+    <div class="chain">
+      <article class="link-card">
+        <p class="k">Step one</p>
+        <h3>The photograph</h3>
+        <p>The full resolution original, with its capture time and location, kept as the record copy.</p>
+      </article>
+      <article class="link-card">
+        <p class="k">Step two</p>
+        <h3>The certificate</h3>
+        <p>The compliance record the item sits in, whether that is a register run or an issued report.</p>
+      </article>
+      <article class="link-card">
+        <p class="k">Step three</p>
+        <h3>The clause</h3>
+        <p>The regulation clause the item was read against, printed with the finding and dated.</p>
+      </article>
+    </div>
+    <div class="notes">
+      <figure class="note">
+        <blockquote>"Week 3 flagged a point missing two extinguishers. Week 4, replaced, photographed, dated, done."</blockquote>
+        <cite>Fire register, six week cycle</cite>
+      </figure>
+      <figure class="note">
+        <blockquote>"The AI never guesses. If it cannot tell, it says so, and the report blocks until a human looks."</blockquote>
+        <cite>Not assessed, every report</cite>
+      </figure>
+      <figure class="note">
+        <blockquote>"One walk, four reports, issued before lunch. That is the whole pitch."</blockquote>
+        <cite>Site walk to issued report</cite>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROOF ================= -->
+<section class="sec" id="proof" aria-labelledby="proof-h">
+  <div class="wrap">
+    <div class="sec-head" style="margin-bottom:clamp(22px,2.6vh,34px)">
+      <h2 class="sec-h wide" id="proof-h">Used on live sites, every week.</h2>
+    </div>
+    <div class="proof">
+      <div class="quote">
+        <blockquote>"Honestly, I used to dread the monthly condition and weatherproofing reports. They would take me 2 or 3 days, and they have to be bang on, because they go to the client team and the insurers. With instructBrain, I snap the photos, review the AI findings, and issue. That is literally it. A client-ready report in minutes."</blockquote>
+        <cite>Senior Site Manager <span aria-hidden="true">&#183;</span> Tier 1 contractor <span aria-hidden="true">&#183;</span> London</cite>
+        <div class="stats" style="margin-top:26px">
+          <div class="stat"><p class="v">150+</p><p class="l">inspections issued</p></div>
+          <div class="stat"><p class="v">2 min</p><p class="l">to first AI draft</p></div>
+          <div class="stat"><p class="v">17</p><p class="l">trades covered</p></div>
+          <div class="stat"><p class="v">25 min</p><p class="l">report turnaround</p></div>
+        </div>
+      </div>
+      <div class="savings">
+        <h3>The write-up gap, in numbers</h3>
+        <p>The write-up is the expensive part of a survey, a snagging list or a compliance register, and it happens after hours. At the calculator's default settings, on a survey of 150 photographs with 2 surveys a month:</p>
+        <div class="sav-grid">
+          <div><p class="v">18.8 hrs</p><p class="l">per survey, writing up at a desk</p></div>
+          <div><p class="v">4 min</p><p class="l">per survey with instructBrain</p></div>
+          <div><p class="v">37 hrs</p><p class="l">saved per month</p></div>
+          <div><p class="v">56 days</p><p class="l">handed back per year</p></div>
+          <div><p class="v">£16,815</p><p class="l">saved per year</p></div>
+          <div><p class="v">1 to 8</p><p class="l">assumed write-up hours per photograph</p></div>
+        </div>
+        <p style="margin-top:16px">Assumes roughly one hour of write-up per 8 photographs by hand, and 4 minutes per survey with instructBrain. Change the numbers to your own in the calculator on the product site.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section class="sec sec-alt" id="pricing" aria-labelledby="price-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Pricing</p>
+      <h2 class="sec-h wide" id="price-h">Priced in reports, not tokens.</h2>
+      <p class="sec-sub">A report is one job, from upload to issued PDF, whichever report type you choose. Go over your photo allowance and you can buy overage per photograph, with no tier jump required.</p>
+    </div>
+    <div class="tiers">
+      <article class="tier">
+        <h3>Free</h3>
+        <p class="price">£0</p>
+        <p class="what">3 reports across any report type. Up to 30 photographs each.</p>
+        <ul>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>No card required</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Every report template</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Issued PDF and share link</span></li>
+        </ul>
+        <a class="btn btn-line" href="https://instructbrain.com/auth/sign-up">Start free</a>
+      </article>
+      <article class="tier tier-pop">
+        <span class="badge">Most popular</span>
+        <h3>Standard</h3>
+        <p class="price">£49 <small>/ month</small></p>
+        <p class="what">10 reports a month, roughly 500 photographs.</p>
+        <ul>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Per-trade extracts</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Close-out tracking</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Overage available per photograph</span></li>
+        </ul>
+        <a class="btn btn-primary" href="https://instructbrain.com/auth/sign-up">Start free, upgrade later</a>
+      </article>
+      <article class="tier">
+        <h3>Practice</h3>
+        <p class="price">£99 <small>/ month</small></p>
+        <p class="what">30 reports a month, roughly 1,500 photographs.</p>
+        <ul>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Everything in Standard</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Multiple surveyors</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Organisation branding</span></li>
+        </ul>
+        <a class="btn btn-line" href="https://instructbrain.com/auth/sign-up">Start free, upgrade later</a>
+      </article>
+      <article class="tier">
+        <h3>Custom</h3>
+        <p class="price">Talk to us</p>
+        <p class="what">Teams and enterprise, priced to your volume.</p>
+        <ul>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Volume pricing</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Bespoke report templates</span></li>
+          <li><span class="tick" aria-hidden="true">&#10003;</span><span>Onboarding support</span></li>
+        </ul>
+        <a class="btn btn-line" href="mailto:hello@instructsite.ai?subject=Report%20Ready%20for%20teams">Contact us</a>
+      </article>
+    </div>
+    <p class="price-note">Billing is coming shortly. The free tier works today, so you can create an account and issue your first three reports now.</p>
+  </div>
+</section>
+
+<!-- ================= FINAL CTA ================= -->
+<section class="sec final" aria-labelledby="final-h">
+  <div class="wrap final-in">
+    <div>
+      <h2 id="final-h">Your next report can be off your desk before the drive home.</h2>
+      <p>Three reports free, no card required. Bring the photographs you already have, in any report type.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="https://instructbrain.com/auth/sign-up">Start free, 3 reports</a>
+        <a class="btn btn-ghost" href="https://instructbrain.com/auth/sign-in">Sign in</a>
+      </div>
+    </div>
+    <p style="font-size:16px;color:var(--ink-3)">Already have an account? <a href="https://instructbrain.com/auth/sign-in" style="color:var(--accent)">Sign in</a></p>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <span class="wm wm-foot"><span class="i">instruct</span><span class="b">Brain</span></span>
+      <p style="font-size:16px;color:var(--ink-2);margin-top:14px;max-width:34ch">Construction reports from site photographs. AI drafts the findings, a person confirms and issues.</p>
+      <div class="legal">
+        <a href="mailto:hello@instructsite.ai" style="color:var(--ink-2);text-decoration:none">Contact</a>
+        <a href="https://instructbrain.com/privacy" style="color:var(--ink-2);text-decoration:none">Privacy</a>
+        <a href="https://instructbrain.com/terms" style="color:var(--ink-2);text-decoration:none">Terms</a>
+      </div>
+      <p style="font-size:16px;color:var(--ink-3);margin-top:18px">&copy; 2026 instructBrain &middot; An InstructSite company</p>
+    </div>
+    <div>
+      <h2>On this page</h2>
+      <ul class="index">
+        <li><a href="#what-h">What it does</a></li>
+        <li><a href="#ai-h">The AI, in plain English</a></li>
+        <li><a href="#manual">Manual reports, no AI</a></li>
+        <li><a href="#reports">The reports you can issue</a></li>
+        <li class="sub"><a href="#condition">Schedule of Condition</a></li>
+        <li class="sub"><a href="#inventories">Property Inventories</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#languages">Languages</a></li>
+        <li><a href="#evidence">Evidence and audit trail</a></li>
+        <li><a href="#proof">Proof</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

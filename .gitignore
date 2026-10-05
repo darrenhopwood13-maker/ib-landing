@@ -1,0 +1,10 @@
+# local QA artefacts, not part of the published page
+*.png
+qa.py
+qa2.py
+shots.py
+sheet.py
+asset-sheet.png
+shot-*.png
+sec*.png
+review-*.png
